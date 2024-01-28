@@ -24,6 +24,42 @@ DX = 14
 DY = 14
 
 
+def calculate_scores(squares):
+    scores = {PLAYER1_COLOR: 0, PLAYER2_COLOR: 0, PLAYER3_COLOR: 0, PLAYER4_COLOR: 0}
+    for row in squares:
+        for color in row:
+            if color in scores:
+                scores[color] += 1
+    return scores
+
+def draw_score_panel(screen, scores, font):
+    panel_height = 40
+    panel_color = (50, 50, 50)  # Dark gray background for score panel
+
+    # Draw the background panel at the bottom
+    pygame.draw.rect(screen, panel_color, (0, HEIGHT - panel_height, WIDTH, panel_height))
+
+    # Calculate the total width of the score texts
+    player_colors = [PLAYER1_COLOR, PLAYER2_COLOR, PLAYER3_COLOR, PLAYER4_COLOR]
+    total_width = 0
+    score_surfaces = []
+    for color in player_colors:
+        score_text = str(scores[color])
+        score_surface = font.render(score_text, True, color)
+        score_surfaces.append(score_surface)
+        total_width += score_surface.get_width() + 30  # Include spacing
+
+    # Start position for the first score text to center the block
+    text_x = (WIDTH - total_width) // 2
+    text_y = HEIGHT - panel_height + (panel_height - font.get_height()) // 2
+
+    # Draw each score text
+    for score_surface in score_surfaces:
+        screen.blit(score_surface, (text_x, text_y))
+        text_x += score_surface.get_width() + 30  # Adjust spacing between scores
+
+
+
 def create_squares():
     squares = []
     for i in range(int(WIDTH / SQUARE_SIZE)):
@@ -99,6 +135,10 @@ def main(args):
         os.makedirs(frame_dir, exist_ok=True)
         frame_num = 0
     pygame.init()
+    pygame.font.init()  # Initialize the font module
+
+    font = pygame.font.SysFont('Consolas', 18)  # Or any other preferred font
+
     # Set up the display
     screen = pygame.display.set_mode((WIDTH, HEIGHT))
     pygame.display.set_caption("Pong Wars")
@@ -127,7 +167,7 @@ def main(args):
         dx3, dy3 = update_square_and_bounce(x3, y3, dx3, dy3, PLAYER3_COLOR, squares)
         dx4, dy4 = update_square_and_bounce(x4, y4, dx4, dy4, PLAYER4_COLOR, squares)
 
-        # Check boundary collisions for players 3 and 4
+        # Check boundary collisions for players
         dx1, dy1 = check_boundary_collision(x1, y1, dx1, dy1)
         dx2, dy2 = check_boundary_collision(x2, y2, dx2, dy2)
         dx3, dy3 = check_boundary_collision(x3, y3, dx3, dy3)
@@ -143,17 +183,21 @@ def main(args):
         y4 += dy4
 
 
-        screen.fill((0, 0, 0))
         draw_squares(squares, screen)
         draw_ball(x1, y1, BALL_COLOR1, screen)
         draw_ball(x2, y2, BALL_COLOR2, screen)
         draw_ball(x3, y3, BALL_COLOR3, screen)
         draw_ball(x4, y4, BALL_COLOR4, screen)
+        
+        # Display scores
+        scores = calculate_scores(squares)
+        draw_score_panel(screen, scores, font)
+        
         if args.record_frames:
             if frame_num%3 == 0:
                 pygame.image.save(screen, os.path.join(frame_dir, f"frame_{frame_num}.png"))
             frame_num += 1
-        
+      
         pygame.display.flip()
         clock.tick(60)
     

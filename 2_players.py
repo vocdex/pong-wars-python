@@ -15,6 +15,42 @@ NIGHT_BALL_COLOR = DAY_COLOR
 DX = 14
 DY = 14
 
+def calculate_scores(squares):
+    scores = {DAY_COLOR: 0, NIGHT_COLOR: 0}
+    for row in squares:
+        for color in row:
+            if color in scores:
+                scores[color] += 1
+    return scores
+
+
+def draw_score_panel(screen, scores, font):
+    panel_height = 40
+    panel_color = (50, 50, 50)  # Dark gray background for score panel
+
+    # Draw the background panel at the bottom
+    pygame.draw.rect(screen, panel_color, (0, HEIGHT - panel_height, WIDTH, panel_height))
+
+    # Calculate the total width of the score texts for 2 players
+    player_colors = [DAY_COLOR, NIGHT_COLOR]
+    total_width = 0
+    score_surfaces = []
+    for color in player_colors:
+        score_text = str(scores[color])
+        score_surface = font.render(score_text, True, color)
+        score_surfaces.append(score_surface)
+        total_width += score_surface.get_width() + 30  # Include spacing
+
+    # Start position for the first score text to center the block
+    text_x = (WIDTH - total_width) // 2
+    text_y = HEIGHT - panel_height + (panel_height - font.get_height()) // 2
+
+    # Draw each score text
+    for score_surface in score_surfaces:
+        screen.blit(score_surface, (text_x, text_y))
+        text_x += score_surface.get_width() + 30  # Adjust spacing between scores
+
+
 
 def create_squares():
     squares = []
@@ -90,6 +126,9 @@ def main(args):
         os.makedirs(frame_dir, exist_ok=True)
         frame_num = 0
     pygame.init()
+    pygame.font.init()  # Initialize the font module
+
+    font = pygame.font.SysFont('Consolas', 18)  # Or any other preferred font
     # Set up the display
     screen = pygame.display.set_mode((WIDTH, HEIGHT))
     pygame.display.set_caption("Pong Wars")
@@ -122,6 +161,10 @@ def main(args):
         draw_squares(squares, screen)
         draw_ball(x1, y1, DAY_BALL_COLOR, screen)
         draw_ball(x2, y2, NIGHT_BALL_COLOR, screen)
+
+        # Display scores
+        scores = calculate_scores(squares)
+        draw_score_panel(screen, scores, font)
         if args.record_frames:
             if frame_num%3 == 0:
                 pygame.image.save(screen, os.path.join(frame_dir, f"frame_{frame_num}.png"))
