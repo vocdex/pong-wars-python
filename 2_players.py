@@ -71,7 +71,9 @@ def make_gif(frames_dir, delete_frames=True):
     frame_files = natsorted(glob.glob(os.path.join(frames_dir, "*.png")))
     
     clip = ImageSequenceClip(frame_files, fps=60)
-    clip.write_gif(os.path.join("pong_wars.gif"), fps=100)
+    pics_dir = "./pics"
+    os.makedirs(pics_dir, exist_ok=True)
+    clip.write_gif(os.path.join(pics_dir, "2_players.gif"))
     # delete frames
     if delete_frames:
         # remove frames folder

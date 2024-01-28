@@ -1,11 +1,13 @@
 # Pong Wars
 <div align="center">
-    <img src="pong_wars.gif" width="400" alt="Pong Wars"/>
+    <img src="./pics/4_players.gif" width="400" alt="Pong Wars" />
+    <img src="./pics/2_players.gif" width="400" alt="Pong Wars" /> 
 </div>
 
 ## Description
 Pong Wars is a colorful and dynamic variation of the classic Pong game implemented in Python using Pygame. In this game, two balls compete to fill the game area with their respective colors.
 
+The current version of the game supports two modes: 2 players and 4 players.
 ## Dependencies
 The project requires Python along with the following libraries:
 ```bash
@@ -13,7 +15,8 @@ pip install pygame moviepy natsort
 ```
 ## Usage
 ```bash
-python pong_wars.py
+python 2_players.py
+python 4_players.py
 ```
 #### Options
 ```bash
