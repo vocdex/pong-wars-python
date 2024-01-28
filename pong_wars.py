@@ -1,6 +1,8 @@
 import pygame
 import random
 import math
+import argparse
+import os
 
 
 # Constants
@@ -53,6 +55,7 @@ def update_square_and_bounce(x, y, dx, dy, color, squares):
                 updated_dy += random.uniform(-0.01, 0.01)
     return updated_dx, updated_dy
 
+
 def check_boundary_collision(x, y, dx, dy):
     if x + dx > WIDTH - SQUARE_SIZE // 2 or x + dx < SQUARE_SIZE // 2:
         dx = -dx
@@ -61,7 +64,29 @@ def check_boundary_collision(x, y, dx, dy):
     return dx, dy
 
 
-def main():
+def make_gif(frames_dir, delete_frames=True):
+    from moviepy.editor import ImageSequenceClip
+    from natsort import natsorted
+    import glob
+    frame_files = natsorted(glob.glob(os.path.join(frames_dir, "*.png")))
+    
+    clip = ImageSequenceClip(frame_files, fps=60)
+    clip.write_gif(os.path.join("pong_wars.gif"), fps=100)
+    # delete frames
+    if delete_frames:
+        # remove frames folder
+        import shutil
+        shutil.rmtree(frames_dir)
+        
+            
+
+def main(args):
+    if args.seed:
+        random.seed(args.seed)
+    if args.record_frames:
+        frame_dir = "frames"
+        os.makedirs(frame_dir, exist_ok=True)
+        frame_num = 0
     pygame.init()
     # Set up the display
     screen = pygame.display.set_mode((WIDTH, HEIGHT))
@@ -95,12 +120,21 @@ def main():
         draw_squares(squares, screen)
         draw_ball(x1, y1, DAY_BALL_COLOR, screen)
         draw_ball(x2, y2, NIGHT_BALL_COLOR, screen)
-
+        if args.record_frames:
+            if frame_num%3 == 0:
+                pygame.image.save(screen, os.path.join(frame_dir, f"frame_{frame_num}.png"))
+            frame_num += 1
+        
         pygame.display.flip()
         clock.tick(60)
-
+    
     pygame.quit()
-
+    if args.record_frames:
+        make_gif(frame_dir)
 
 if __name__ == "__main__":
-    main()
+    args = argparse.ArgumentParser()
+    args.add_argument("--record_frames", action="store_true", help="Record frames for making a movie", default=False)
+    args.add_argument("--seed", type=int, help="Seed for random number generator", default=0)
+    args = args.parse_args()
+    main(args)
