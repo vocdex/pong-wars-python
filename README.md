@@ -1,3 +1,6 @@
+# WIP 
+
+<!---
 # Pong Wars
 <div align="center">
     <img src="./pics/4_players.gif" width="400" alt="Pong Wars" />
@@ -31,3 +34,5 @@ args:
 
 ## What's next?
 1. Build Gymnasium environment for Pong Wars to train RL agents
+
+-->
