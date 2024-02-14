@@ -68,10 +68,18 @@ def main(args):
                            numpy.array([-BALL_SPEED, -BALL_SPEED], dtype=float)]
 
     running = True
+    paused = False
     while running:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
+
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_p:
+                    paused = not paused
+
+        if paused:
+            continue
 
         for i in range(player_num):
             ball_directions[i] = pong_wars_model.update_square_and_bounce(ball_positions[i], ball_directions[i], i+1, squares, SQUARE_SIZE, BALL_RADIUS)    # Player index in "squares" starts from "1" rather than "0"
