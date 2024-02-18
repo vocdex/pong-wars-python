@@ -7,9 +7,6 @@ import os
 
 
 def draw_score_panel(screen, scores, font, width, height, panel_height, panel_color, player_num, player_colors):
-    panel_height = 40
-    panel_color = (50, 50, 50)  # Dark gray background for score panel
-
     # Draw the background panel at the bottom
     pygame.draw.rect(screen, panel_color, (0, height, width, panel_height))
 
@@ -31,10 +28,37 @@ def draw_score_panel(screen, scores, font, width, height, panel_height, panel_co
         screen.blit(score_surface, (text_x, text_y))
         text_x += score_surface.get_width() + 30  # Adjust spacing between scores
 
+
+def draw_tutorial_panel(screen, font, width, height, panel_height, panel_color, text_color, player_num):
+    tutorial_texts = [
+        "P: Pause / Restart" , 
+        "When paused:", 
+        "    " + ("1,2,3,4" if player_num == 4 else "1,2") + ": Change player", 
+        "    Arrow Keys: Move overwrite area", 
+        "    Enter: Overwrite"
+    ]
+
+    # Draw the background panel at the bottom
+    pygame.draw.rect(screen, panel_color, (0, height, width, panel_height))
+
+    text_y = height
+    for tutorial_text in tutorial_texts:
+        tutorial_surface = font.render(tutorial_text, True, text_color)
+        
+        # Draw each score text
+        screen.blit(tutorial_surface, (30, text_y))
+
+        line_spacing = 5
+        text_y += font.get_height() + line_spacing
+
+    
+
+
 def draw_overwrite_area_cover(screen, top_left_position, size, color, transparency):
     rect_surface = pygame.Surface(size, pygame.SRCALPHA)
     rect_surface.fill((color[0], color[1], color[2], int(255 * transparency)))
     screen.blit(rect_surface, top_left_position)
+
 
 def draw_squares(squares, screen, square_size, player_colors):
     for i in range(squares.shape[0]):

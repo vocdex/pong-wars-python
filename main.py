@@ -19,7 +19,7 @@ BALL_RADIUS = 12                                # Radius of the ball
 BALL_SPEED = 15                                 # Speed of the ball in pixel, better not bigger than SQUARE_SIZE
 
 SCORE_PANEL_HEIGHT = 40
-TUTORIAL_PANEL_HEIGHT = 40
+TUTORIAL_PANEL_HEIGHT = 120
 
 PLAYER_NUM_LIST = [2, 4]                        # Numbers of players supported
 
@@ -28,6 +28,7 @@ BALL_COLORS = [(255, 0, 0), (255, 255, 0), (0, 255, 0), (0, 0, 255)]    # Ball c
 
 SCORE_PANEL_COLOR = (50, 50, 50)  # Dark gray background for panel
 TUTORIAL_PANEL_COLOR = (50, 50, 50)  # Dark gray background for panel
+TUTORIAL_TEXT_COLOR = (0, 0, 0)
         
 
 def main(args):
@@ -126,6 +127,9 @@ def main(args):
         scores = pong_wars_model.calculate_scores(squares)
         pong_wars_view.draw_score_panel(screen, scores, font, width_pixel, height_pixel, SCORE_PANEL_HEIGHT, SCORE_PANEL_COLOR, player_num, PLAYER_COLORS)
         
+        # Display tutorial
+        pong_wars_view.draw_tutorial_panel(screen, font, width_pixel, height_pixel + SCORE_PANEL_HEIGHT, TUTORIAL_PANEL_HEIGHT, TUTORIAL_PANEL_COLOR, TUTORIAL_TEXT_COLOR, player_num)
+
         if args.record_frames:
             if frame_num%3 == 0:
                 pygame.image.save(screen, os.path.join(frame_dir, f"frame_{frame_num}.png"))
