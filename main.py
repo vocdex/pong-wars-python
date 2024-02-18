@@ -18,10 +18,16 @@ SQUARE_SIZE = 24                                # Size of a square in pixel
 BALL_RADIUS = 12                                # Radius of the ball
 BALL_SPEED = 15                                 # Speed of the ball in pixel, better not bigger than SQUARE_SIZE
 
+SCORE_PANEL_HEIGHT = 40
+TUTORIAL_PANEL_HEIGHT = 40
+
 PLAYER_NUM_LIST = [2, 4]                        # Numbers of players supported
 
 PLAYER_COLORS = [(255, 153, 153), (255, 255, 153), (153, 255, 153), (153, 153, 255)]
 BALL_COLORS = [(255, 0, 0), (255, 255, 0), (0, 255, 0), (0, 0, 255)]    # Ball colors for each player, contrast is important
+
+SCORE_PANEL_COLOR = (50, 50, 50)  # Dark gray background for panel
+TUTORIAL_PANEL_COLOR = (50, 50, 50)  # Dark gray background for panel
         
 
 def main(args):
@@ -47,7 +53,7 @@ def main(args):
     font = pygame.font.SysFont('Consolas', 18)  # Or any other preferred font
 
     # Set up the display
-    screen = pygame.display.set_mode((width_pixel, height_pixel))
+    screen = pygame.display.set_mode((width_pixel, height_pixel + SCORE_PANEL_HEIGHT + TUTORIAL_PANEL_HEIGHT))
     pygame.display.set_caption("Pong Wars Strategy")
 
     clock = pygame.time.Clock()
@@ -118,7 +124,7 @@ def main(args):
         
         # Display scores
         scores = pong_wars_model.calculate_scores(squares)
-        pong_wars_view.draw_score_panel(screen, scores, font, width_pixel, height_pixel, player_num, PLAYER_COLORS)
+        pong_wars_view.draw_score_panel(screen, scores, font, width_pixel, height_pixel, SCORE_PANEL_HEIGHT, SCORE_PANEL_COLOR, player_num, PLAYER_COLORS)
         
         if args.record_frames:
             if frame_num%3 == 0:

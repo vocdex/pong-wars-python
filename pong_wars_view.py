@@ -6,12 +6,12 @@ import pygame
 import os
 
 
-def draw_score_panel(screen, scores, font, width, height, player_num, player_colors):
+def draw_score_panel(screen, scores, font, width, height, panel_height, panel_color, player_num, player_colors):
     panel_height = 40
     panel_color = (50, 50, 50)  # Dark gray background for score panel
 
     # Draw the background panel at the bottom
-    pygame.draw.rect(screen, panel_color, (0, height - panel_height, width, panel_height))
+    pygame.draw.rect(screen, panel_color, (0, height, width, panel_height))
 
     # Calculate the total width of the score texts
     total_width = 0
@@ -24,7 +24,7 @@ def draw_score_panel(screen, scores, font, width, height, player_num, player_col
 
     # Start position for the first score text to center the block
     text_x = (width - total_width) // 2
-    text_y = height - panel_height + (panel_height - font.get_height()) // 2
+    text_y = height + (panel_height - font.get_height()) // 2
 
     # Draw each score text
     for score_surface in score_surfaces:
