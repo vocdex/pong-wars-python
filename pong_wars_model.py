@@ -12,6 +12,13 @@ def calculate_scores(squares: numpy.ndarray):
     return dict(zip(unique, counts))
 
 
+def calculate_overwrite_area(position: numpy.ndarray, size: numpy.ndarray, width: int, height: int):
+    position_int = numpy.floor(position).astype(int)
+    position_top_left = numpy.clip(position_int, [0, 0], [width, height]).astype(int)
+    position_bottom_right = numpy.clip(position_top_left + size, [0, 0], [width, height]).astype(int)
+    return (position_top_left, (position_bottom_right - position_top_left))
+
+
 def create_squares(width_square_num: int, height_square_num: int, player_num: int):
     squares = numpy.zeros((width_square_num, height_square_num))
     for i in range(width_square_num):
@@ -23,7 +30,6 @@ def create_squares(width_square_num: int, height_square_num: int, player_num: in
                     squares[i][j] = 1 if j < height_square_num / 2 else 3
                 else:
                     squares[i][j] = 2 if j < height_square_num / 2 else 4
-    print(squares)
     return squares
 
 
@@ -42,6 +48,14 @@ def update_square_and_bounce(position: numpy.ndarray, direction: numpy.ndarray, 
                     updated_direction[1] *= -1.0
                 updated_direction += random.uniform(-0.01, 0.01)
     return updated_direction
+
+
+def overwrite_squares(player_index: int, top_left_position: numpy.ndarray, size: numpy.ndarray, squares: numpy.ndarray, square_size: int):
+    i_start, j_start = top_left_position // square_size
+    i_end, j_end = (top_left_position + size) // square_size
+    for i in range(i_start, i_end):
+        for j in range(j_start, j_end):
+            squares[i][j] = player_index
 
 
 def check_boundary_collision(position: numpy.ndarray, direction: numpy.ndarray, width: int, height: int, pong_radius: int):

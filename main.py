@@ -69,7 +69,13 @@ def main(args):
 
     running = True
     paused = False
+    overwrite_player_index = 1
+    overwrite_position = numpy.array([width_pixel // 2, height_pixel // 2], dtype=float)
+    overwrite_size = numpy.array([5 * SQUARE_SIZE, 5 * SQUARE_SIZE], dtype=float)
+    overwrite_area_move_speed = SQUARE_SIZE / 12.0
     while running:
+        enter_pushed = False
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
@@ -77,16 +83,35 @@ def main(args):
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_p:
                     paused = not paused
+                if pygame.K_1 <= event.key <= pygame.K_0 + player_num:
+                    overwrite_player_index = event.key - pygame.K_0
+                if event.key == pygame.K_RETURN or event.key == pygame.K_KP_ENTER:
+                    enter_pushed = True
 
-        if paused:
-            continue
-
-        for i in range(player_num):
-            ball_directions[i] = pong_wars_model.update_square_and_bounce(ball_positions[i], ball_directions[i], i+1, squares, SQUARE_SIZE, BALL_RADIUS)    # Player index in "squares" starts from "1" rather than "0"
-            ball_directions[i] = pong_wars_model.check_boundary_collision(ball_positions[i], ball_directions[i], width_pixel, height_pixel, BALL_RADIUS)
-            ball_positions[i] += ball_directions[i]
+        if not paused:
+            for i in range(player_num):
+                ball_directions[i] = pong_wars_model.update_square_and_bounce(ball_positions[i], ball_directions[i], i+1, squares, SQUARE_SIZE, BALL_RADIUS)    # Player index in "squares" starts from "1" rather than "0"
+                ball_directions[i] = pong_wars_model.check_boundary_collision(ball_positions[i], ball_directions[i], width_pixel, height_pixel, BALL_RADIUS)
+                ball_positions[i] += ball_directions[i]
 
         pong_wars_view.draw_squares(squares, screen, SQUARE_SIZE, PLAYER_COLORS)
+
+        if paused:
+            keys = pygame.key.get_pressed()
+            if keys[pygame.K_LEFT]:
+                overwrite_position[0] -= overwrite_area_move_speed
+            if keys[pygame.K_RIGHT]:
+                overwrite_position[0] += overwrite_area_move_speed
+            if keys[pygame.K_UP]:
+                overwrite_position[1] -= overwrite_area_move_speed
+            if keys[pygame.K_DOWN]:
+                overwrite_position[1] += overwrite_area_move_speed
+
+            real_overwrite_position, real_overwrite_size = pong_wars_model.calculate_overwrite_area(overwrite_position, overwrite_size, width_pixel, height_pixel)
+            pong_wars_view.draw_overwrite_area_cover(screen, real_overwrite_position, real_overwrite_size, PLAYER_COLORS[overwrite_player_index-1], 0.5)
+
+            if enter_pushed:
+                pong_wars_model.overwrite_squares(overwrite_player_index, real_overwrite_position, real_overwrite_size, squares, SQUARE_SIZE)
 
         for i in range(player_num):
             pong_wars_view.draw_ball(ball_positions[i], BALL_COLORS[i], screen, SQUARE_SIZE)

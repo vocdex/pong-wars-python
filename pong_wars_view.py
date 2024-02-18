@@ -31,6 +31,10 @@ def draw_score_panel(screen, scores, font, width, height, player_num, player_col
         screen.blit(score_surface, (text_x, text_y))
         text_x += score_surface.get_width() + 30  # Adjust spacing between scores
 
+def draw_overwrite_area_cover(screen, top_left_position, size, color, transparency):
+    rect_surface = pygame.Surface(size, pygame.SRCALPHA)
+    rect_surface.fill((color[0], color[1], color[2], int(255 * transparency)))
+    screen.blit(rect_surface, top_left_position)
 
 def draw_squares(squares, screen, square_size, player_colors):
     for i in range(squares.shape[0]):
