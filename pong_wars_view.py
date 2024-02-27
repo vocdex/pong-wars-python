@@ -6,27 +6,28 @@ import pygame
 import os
 
 
-def draw_score_panel(screen, scores, font, width, height, panel_height, panel_color, player_num, player_colors):
+def draw_centered_text_panel(screen, texts, font, width, height, panel_height, panel_color, player_num, player_colors):
     # Draw the background panel at the bottom
     pygame.draw.rect(screen, panel_color, (0, height, width, panel_height))
 
     # Calculate the total width of the score texts
     total_width = 0
-    score_surfaces = []
+    surfaces = []
     for i in range(player_num):
-        score_text = str(scores[i+1])   # "scores" is a dictionary, and the key (player index) starts from 1 rather than 0 
-        score_surface = font.render(score_text, True, player_colors[i])
-        score_surfaces.append(score_surface)
-        total_width += score_surface.get_width() + 30  # Include spacing
-
+        text = texts[i]
+        surface = font.render(text, True, player_colors[i])
+        surfaces.append(surface)
+        total_width += surface.get_width() + 30  # Include spacing
+    total_width -= 30
+    
     # Start position for the first score text to center the block
     text_x = (width - total_width) // 2
     text_y = height + (panel_height - font.get_height()) // 2
 
     # Draw each score text
-    for score_surface in score_surfaces:
-        screen.blit(score_surface, (text_x, text_y))
-        text_x += score_surface.get_width() + 30  # Adjust spacing between scores
+    for surface in surfaces:
+        screen.blit(surface, (text_x, text_y))
+        text_x += surface.get_width() + 30  # Adjust spacing between scores
 
 
 def draw_tutorial_panel(isPaused, screen, font, width, height, panel_height, panel_color, text_color, player_num):

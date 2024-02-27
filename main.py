@@ -125,8 +125,8 @@ def main(args):
         
         # Display scores
         scores = pong_wars_model.calculate_scores(squares)
-        pong_wars_view.draw_score_panel(screen, scores, font, width_pixel, height_pixel, SCORE_PANEL_HEIGHT, SCORE_PANEL_COLOR, player_num, PLAYER_COLORS)
-        
+        scores_texts = [str(scores[i+1]) for i in range(player_num)]    # "scores" is a dictionary, and the key (player index) starts from 1 rather than 0 
+        pong_wars_view.draw_centered_text_panel(screen, scores_texts, font, width_pixel, height_pixel, SCORE_PANEL_HEIGHT, SCORE_PANEL_COLOR, player_num, PLAYER_COLORS)
         # Display tutorial
         pong_wars_view.draw_tutorial_panel(paused, screen, font, width_pixel, height_pixel + SCORE_PANEL_HEIGHT, TUTORIAL_PANEL_HEIGHT, TUTORIAL_PANEL_COLOR, TUTORIAL_TEXT_COLOR, player_num)
 
