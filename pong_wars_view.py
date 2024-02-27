@@ -29,13 +29,14 @@ def draw_score_panel(screen, scores, font, width, height, panel_height, panel_co
         text_x += score_surface.get_width() + 30  # Adjust spacing between scores
 
 
-def draw_tutorial_panel(screen, font, width, height, panel_height, panel_color, text_color, player_num):
+def draw_tutorial_panel(isPaused, screen, font, width, height, panel_height, panel_color, text_color, player_num):
     tutorial_texts = [
-        "P: Pause / Restart" , 
-        "When paused:", 
-        "    " + ("1,2,3,4" if player_num == 4 else "1,2") + ": Change player", 
-        "    Arrow Keys: Move overwrite area", 
-        "    Enter: Overwrite"
+        "Paused",
+        ("1,2,3,4" if player_num == 4 else "1,2") + ": Change player", 
+        "Arrow Keys: Move overwrite area", 
+        "Enter: Overwrite"
+    ] if isPaused else [
+        "P: Pause / Restart"
     ]
 
     # Draw the background panel at the bottom

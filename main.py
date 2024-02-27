@@ -128,7 +128,7 @@ def main(args):
         pong_wars_view.draw_score_panel(screen, scores, font, width_pixel, height_pixel, SCORE_PANEL_HEIGHT, SCORE_PANEL_COLOR, player_num, PLAYER_COLORS)
         
         # Display tutorial
-        pong_wars_view.draw_tutorial_panel(screen, font, width_pixel, height_pixel + SCORE_PANEL_HEIGHT, TUTORIAL_PANEL_HEIGHT, TUTORIAL_PANEL_COLOR, TUTORIAL_TEXT_COLOR, player_num)
+        pong_wars_view.draw_tutorial_panel(paused, screen, font, width_pixel, height_pixel + SCORE_PANEL_HEIGHT, TUTORIAL_PANEL_HEIGHT, TUTORIAL_PANEL_COLOR, TUTORIAL_TEXT_COLOR, player_num)
 
         if args.record_frames:
             if frame_num%3 == 0:
