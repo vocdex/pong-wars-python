@@ -30,6 +30,8 @@ SCORE_PANEL_COLOR = (50, 50, 50)  # Dark gray background for panel
 TUTORIAL_PANEL_COLOR = (50, 50, 50)  # Dark gray background for panel
 TUTORIAL_TEXT_COLOR = (0, 0, 0)
         
+GAME_TIME = 3 * 60             # In seconds
+OVERWRITE_COOLDOWN_TIME = 30   # In seconds
 
 def main(args):
     player_num = 2
@@ -76,10 +78,15 @@ def main(args):
 
     running = True
     paused = False
+
+    game_timer = GAME_TIME
+
     overwrite_player_index = 1
     overwrite_position = numpy.array([width_pixel // 2, height_pixel // 2], dtype=float)
     overwrite_size = numpy.array([5 * SQUARE_SIZE, 5 * SQUARE_SIZE], dtype=float)
     overwrite_area_move_speed = SQUARE_SIZE / 12.0
+    overwrite_cooldown_timers = numpy.zeros(player_num, dtype=float)
+    
     while running:
         enter_pushed = False
 
@@ -118,7 +125,11 @@ def main(args):
             pong_wars_view.draw_overwrite_area_cover(screen, real_overwrite_position, real_overwrite_size, PLAYER_COLORS[overwrite_player_index-1], 0.5)
 
             if enter_pushed:
-                pong_wars_model.overwrite_squares(overwrite_player_index, real_overwrite_position, real_overwrite_size, squares, SQUARE_SIZE)
+                if overwrite_cooldown_timers[overwrite_player_index-1] <= 0:
+                    pong_wars_model.overwrite_squares(overwrite_player_index, real_overwrite_position, real_overwrite_size, squares, SQUARE_SIZE)
+                    overwrite_cooldown_timers[overwrite_player_index-1] = OVERWRITE_COOLDOWN_TIME
+                else:
+                    pass    #TODO: Let the player now it is in cooldown
 
         for i in range(player_num):
             pong_wars_view.draw_ball(ball_positions[i], BALL_COLORS[i], screen, SQUARE_SIZE)
@@ -127,8 +138,11 @@ def main(args):
         scores = pong_wars_model.calculate_scores(squares)
         scores_texts = [str(scores[i+1]) for i in range(player_num)]    # "scores" is a dictionary, and the key (player index) starts from 1 rather than 0 
         pong_wars_view.draw_centered_text_panel(screen, scores_texts, font, width_pixel, height_pixel, SCORE_PANEL_HEIGHT, SCORE_PANEL_COLOR, player_num, PLAYER_COLORS)
+        cooldown_texts = [("CD: " + f"{overwrite_cooldown_timers[i]:.1f}" if overwrite_cooldown_timers[i] > 0 else "READY") for i in range(player_num)] 
+        pong_wars_view.draw_centered_text_panel(screen, cooldown_texts, font, width_pixel, height_pixel + SCORE_PANEL_HEIGHT, SCORE_PANEL_HEIGHT, SCORE_PANEL_COLOR, player_num, PLAYER_COLORS)
+
         # Display tutorial
-        pong_wars_view.draw_tutorial_panel(paused, screen, font, width_pixel, height_pixel + SCORE_PANEL_HEIGHT, TUTORIAL_PANEL_HEIGHT, TUTORIAL_PANEL_COLOR, TUTORIAL_TEXT_COLOR, player_num)
+        pong_wars_view.draw_tutorial_panel(paused, screen, font, width_pixel, height_pixel + SCORE_PANEL_HEIGHT * 2, TUTORIAL_PANEL_HEIGHT, TUTORIAL_PANEL_COLOR, TUTORIAL_TEXT_COLOR, player_num)
 
         if args.record_frames:
             if frame_num%3 == 0:
@@ -136,7 +150,14 @@ def main(args):
             frame_num += 1
       
         pygame.display.flip()
-        clock.tick(60)
+        dt = clock.tick(60)
+
+        if not paused:
+            game_timer -= dt * 0.001    # dt is millisecond
+            overwrite_cooldown_timers = numpy.where(overwrite_cooldown_timers > 0, overwrite_cooldown_timers - dt * 0.001, overwrite_cooldown_timers)
+
+        if game_timer <= 0:
+            pass    #TODO: Game over. Show the winner
     
     pygame.quit()
     if args.record_frames:
