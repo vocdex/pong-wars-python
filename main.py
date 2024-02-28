@@ -14,22 +14,23 @@ import pong_wars_view
 
 # Constants
 WIDTH_EACH_PLAYER, HEIGHT_EACH_PLAYER = 16, 16  # Numbers of squares in width and height for each player
-SQUARE_SIZE = 24                                # Size of a square in pixel
+SQUARE_SIZE = 16                                # Size of a square in pixel
 BALL_RADIUS = 12                                # Radius of the ball
 BALL_SPEED = 15                                 # Speed of the ball in pixel, better not bigger than SQUARE_SIZE
 
-SCORE_PANEL_HEIGHT = 40
-TUTORIAL_PANEL_HEIGHT = 120
+TEXT_PANEL_HEIGHT = 20
+TUTORIAL_PANEL_HEIGHT = 100
 
 PLAYER_NUM_LIST = [2, 4]                        # Numbers of players supported
 
-PLAYER_COLORS = [(255, 153, 153), (255, 255, 153), (153, 255, 153), (153, 153, 255)]
-BALL_COLORS = [(255, 0, 0), (255, 255, 0), (0, 255, 0), (0, 0, 255)]    # Ball colors for each player, contrast is important
+PLAYER_COLORS = [(255, 153, 153), (153, 153, 255), (255, 153, 255), (153, 255, 153)]
+BALL_COLORS = [(255, 0, 0), (0, 0, 255), (255, 0, 255), (0, 255, 0)]    # Ball colors for each player, contrast is important
 
-SCORE_PANEL_COLOR = (50, 50, 50)  # Dark gray background for panel
-TUTORIAL_PANEL_COLOR = (50, 50, 50)  # Dark gray background for panel
-TUTORIAL_TEXT_COLOR = (0, 0, 0)
+PANEL_COLOR = (50, 50, 50)  # Dark gray background for panel
+TEXT_COLOR = (255, 255, 255)
         
+GAME_TIME = 2 * 60              # In seconds
+OVERWRITE_COOLDOWN_TIME = 20    # In seconds
 
 def main(args):
     player_num = 2
@@ -54,7 +55,7 @@ def main(args):
     font = pygame.font.SysFont('Consolas', 18)  # Or any other preferred font
 
     # Set up the display
-    screen = pygame.display.set_mode((width_pixel, height_pixel + SCORE_PANEL_HEIGHT + TUTORIAL_PANEL_HEIGHT))
+    screen = pygame.display.set_mode((width_pixel, height_pixel + TEXT_PANEL_HEIGHT * 3 + TUTORIAL_PANEL_HEIGHT))
     pygame.display.set_caption("Pong Wars Strategy")
 
     clock = pygame.time.Clock()
@@ -62,24 +63,29 @@ def main(args):
 
     ball_positions = [numpy.array([width_pixel / 4, height_pixel / 2], dtype=float),
                       numpy.array([3 * width_pixel / 4, height_pixel / 2], dtype=float)]
-    ball_directions = [numpy.array([BALL_SPEED, BALL_SPEED], dtype=float),
-                       numpy.array([-BALL_SPEED, -BALL_SPEED], dtype=float)]
     if player_num == 4:
         ball_positions = [numpy.array([width_pixel / 4, height_pixel / 4], dtype=float), 
                           numpy.array([3 * width_pixel / 4, height_pixel / 4], dtype=float), 
                           numpy.array([width_pixel / 4, 3 * height_pixel / 4], dtype=float), 
                           numpy.array([3 * width_pixel / 4, 3 * height_pixel / 4], dtype=float)]
-        ball_directions = [numpy.array([BALL_SPEED, BALL_SPEED], dtype=float),
-                           numpy.array([-BALL_SPEED, BALL_SPEED], dtype=float),
-                           numpy.array([BALL_SPEED, -BALL_SPEED], dtype=float),
-                           numpy.array([-BALL_SPEED, -BALL_SPEED], dtype=float)]
+    desired_angles = [numpy.pi * i / 4 for i in [1, 3, 7, 5][:player_num]]
+    angle_variation = numpy.pi / 16  # +/- 11.25 degrees variation
+    start_angles = desired_angles + numpy.random.uniform(-angle_variation, angle_variation, player_num)
+    ball_directions = numpy.vstack((numpy.cos(start_angles), numpy.sin(start_angles))).T
+    ball_directions /= numpy.linalg.norm(ball_directions, axis=1)[:, numpy.newaxis]
 
     running = True
     paused = False
+    gameover = False
+
+    game_timer = GAME_TIME
+
     overwrite_player_index = 1
     overwrite_position = numpy.array([width_pixel // 2, height_pixel // 2], dtype=float)
-    overwrite_size = numpy.array([5 * SQUARE_SIZE, 5 * SQUARE_SIZE], dtype=float)
+    overwrite_size = numpy.array([8 * SQUARE_SIZE, 8 * SQUARE_SIZE], dtype=float)
     overwrite_area_move_speed = SQUARE_SIZE / 12.0
+    overwrite_cooldown_timers = numpy.zeros(player_num, dtype=float)
+    
     while running:
         enter_pushed = False
 
@@ -87,19 +93,20 @@ def main(args):
             if event.type == pygame.QUIT:
                 running = False
 
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_p:
-                    paused = not paused
-                if pygame.K_1 <= event.key <= pygame.K_0 + player_num:
-                    overwrite_player_index = event.key - pygame.K_0
-                if event.key == pygame.K_RETURN or event.key == pygame.K_KP_ENTER:
-                    enter_pushed = True
+            if not gameover:
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_p:
+                        paused = not paused
+                    if pygame.K_1 <= event.key <= pygame.K_0 + player_num:
+                        overwrite_player_index = event.key - pygame.K_0
+                    if event.key == pygame.K_RETURN or event.key == pygame.K_KP_ENTER:
+                        enter_pushed = True
 
-        if not paused:
+        if not paused and not gameover:
             for i in range(player_num):
                 ball_directions[i] = pong_wars_model.update_square_and_bounce(ball_positions[i], ball_directions[i], i+1, squares, SQUARE_SIZE, BALL_RADIUS)    # Player index in "squares" starts from "1" rather than "0"
-                ball_directions[i] = pong_wars_model.check_boundary_collision(ball_positions[i], ball_directions[i], width_pixel, height_pixel, BALL_RADIUS)
-                ball_positions[i] += ball_directions[i]
+                ball_directions[i] = pong_wars_model.check_boundary_collision(ball_positions[i], ball_directions[i], width_pixel, height_pixel, BALL_RADIUS, BALL_SPEED)
+                ball_positions[i] += ball_directions[i] * BALL_SPEED
 
         pong_wars_view.draw_squares(squares, screen, SQUARE_SIZE, PLAYER_COLORS)
 
@@ -118,17 +125,32 @@ def main(args):
             pong_wars_view.draw_overwrite_area_cover(screen, real_overwrite_position, real_overwrite_size, PLAYER_COLORS[overwrite_player_index-1], 0.5)
 
             if enter_pushed:
-                pong_wars_model.overwrite_squares(overwrite_player_index, real_overwrite_position, real_overwrite_size, squares, SQUARE_SIZE)
+                if overwrite_cooldown_timers[overwrite_player_index-1] <= 0:
+                    pong_wars_model.overwrite_squares(overwrite_player_index, real_overwrite_position, real_overwrite_size, squares, SQUARE_SIZE)
+                    overwrite_cooldown_timers[overwrite_player_index-1] = OVERWRITE_COOLDOWN_TIME
+                else:
+                    pass    #TODO: Let the player now it is in cooldown
 
         for i in range(player_num):
             pong_wars_view.draw_ball(ball_positions[i], BALL_COLORS[i], screen, SQUARE_SIZE)
         
+        if gameover:    # Display winner
+            winner = int(max(scores, key=lambda i: scores[i]))
+            winner_text = "Winner: Player " + str(winner)
+            pong_wars_view.draw_centered_text_panel(screen, winner_text, font, width_pixel, height_pixel, TEXT_PANEL_HEIGHT, PANEL_COLOR, PLAYER_COLORS[winner-1])
+        else:           # Display game timer
+            game_timer_text = "Time left: " + f"{game_timer:.1f}"
+            pong_wars_view.draw_centered_text_panel(screen, game_timer_text, font, width_pixel, height_pixel, TEXT_PANEL_HEIGHT, PANEL_COLOR, TEXT_COLOR)
         # Display scores
         scores = pong_wars_model.calculate_scores(squares)
-        pong_wars_view.draw_score_panel(screen, scores, font, width_pixel, height_pixel, SCORE_PANEL_HEIGHT, SCORE_PANEL_COLOR, player_num, PLAYER_COLORS)
-        
+        scores_texts = [str(scores[i+1]) for i in range(player_num)]    # "scores" is a dictionary, and the key (player index) starts from 1 rather than 0 
+        pong_wars_view.draw_centered_text_each_player_panel(screen, scores_texts, font, width_pixel, height_pixel + TEXT_PANEL_HEIGHT, TEXT_PANEL_HEIGHT, PANEL_COLOR, player_num, PLAYER_COLORS)
+        # Display overwrite cooldown timer
+        cooldown_texts = [("CD: " + f"{overwrite_cooldown_timers[i]:.1f}" if overwrite_cooldown_timers[i] > 0 else "READY") for i in range(player_num)] 
+        pong_wars_view.draw_centered_text_each_player_panel(screen, cooldown_texts, font, width_pixel, height_pixel + TEXT_PANEL_HEIGHT * 2, TEXT_PANEL_HEIGHT, PANEL_COLOR, player_num, PLAYER_COLORS)
+
         # Display tutorial
-        pong_wars_view.draw_tutorial_panel(screen, font, width_pixel, height_pixel + SCORE_PANEL_HEIGHT, TUTORIAL_PANEL_HEIGHT, TUTORIAL_PANEL_COLOR, TUTORIAL_TEXT_COLOR, player_num)
+        pong_wars_view.draw_tutorial_panel(paused, screen, font, width_pixel, height_pixel + TEXT_PANEL_HEIGHT * 3, TUTORIAL_PANEL_HEIGHT, PANEL_COLOR, TEXT_COLOR, player_num)
 
         if args.record_frames:
             if frame_num%3 == 0:
@@ -136,7 +158,14 @@ def main(args):
             frame_num += 1
       
         pygame.display.flip()
-        clock.tick(60)
+        dt = clock.tick(60)
+
+        if not paused:
+            game_timer -= dt * 0.001    # dt is millisecond
+            overwrite_cooldown_timers = numpy.where(overwrite_cooldown_timers > 0, overwrite_cooldown_timers - dt * 0.001, overwrite_cooldown_timers)
+
+        if game_timer <= 0:
+            gameover = True
     
     pygame.quit()
     if args.record_frames:
