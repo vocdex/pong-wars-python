@@ -47,6 +47,7 @@ def update_square_and_bounce(position: numpy.ndarray, direction: numpy.ndarray, 
                 else:
                     updated_direction[1] *= -1.0
                 updated_direction += random.uniform(-0.01, 0.01)
+    updated_direction /= numpy.linalg.norm(updated_direction)
     return updated_direction
 
 
@@ -58,12 +59,12 @@ def overwrite_squares(player_index: int, top_left_position: numpy.ndarray, size:
             squares[i][j] = player_index
 
 
-def check_boundary_collision(position: numpy.ndarray, direction: numpy.ndarray, width: int, height: int, pong_radius: int):
+def check_boundary_collision(position: numpy.ndarray, direction: numpy.ndarray, width: int, height: int, pong_radius: int, pong_speed: int):
     x, y = position
     dx, dy = direction
-    if x + dx > width - pong_radius // 2 or x + dx < pong_radius // 2:
+    if x + dx  * pong_speed > width - pong_radius // 2 or x + dx * pong_speed < pong_radius // 2:
         dx = -dx
-    if y + dy > height - pong_radius // 2 or y + dy < pong_radius // 2:
+    if y + dy * pong_speed > height - pong_radius // 2 or y + dy * pong_speed < pong_radius // 2:
         dy = -dy
     return numpy.array([dx, dy], dtype=float)
 

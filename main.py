@@ -16,7 +16,7 @@ import pong_wars_view
 WIDTH_EACH_PLAYER, HEIGHT_EACH_PLAYER = 16, 16  # Numbers of squares in width and height for each player
 SQUARE_SIZE = 16                                # Size of a square in pixel
 BALL_RADIUS = 12                                # Radius of the ball
-BALL_SPEED = 10                                 # Speed of the ball in pixel, better not bigger than SQUARE_SIZE
+BALL_SPEED = 15                                 # Speed of the ball in pixel, better not bigger than SQUARE_SIZE
 
 TEXT_PANEL_HEIGHT = 20
 TUTORIAL_PANEL_HEIGHT = 100
@@ -29,7 +29,7 @@ BALL_COLORS = [(255, 0, 0), (0, 0, 255), (255, 0, 255), (0, 255, 0)]    # Ball c
 PANEL_COLOR = (50, 50, 50)  # Dark gray background for panel
 TEXT_COLOR = (255, 255, 255)
         
-GAME_TIME = 1 * 60              # In seconds
+GAME_TIME = 2 * 60              # In seconds
 OVERWRITE_COOLDOWN_TIME = 20    # In seconds
 
 def main(args):
@@ -63,17 +63,16 @@ def main(args):
 
     ball_positions = [numpy.array([width_pixel / 4, height_pixel / 2], dtype=float),
                       numpy.array([3 * width_pixel / 4, height_pixel / 2], dtype=float)]
-    ball_directions = [numpy.array([BALL_SPEED, BALL_SPEED], dtype=float),
-                       numpy.array([-BALL_SPEED, -BALL_SPEED], dtype=float)]
     if player_num == 4:
         ball_positions = [numpy.array([width_pixel / 4, height_pixel / 4], dtype=float), 
                           numpy.array([3 * width_pixel / 4, height_pixel / 4], dtype=float), 
                           numpy.array([width_pixel / 4, 3 * height_pixel / 4], dtype=float), 
                           numpy.array([3 * width_pixel / 4, 3 * height_pixel / 4], dtype=float)]
-        ball_directions = [numpy.array([BALL_SPEED, BALL_SPEED], dtype=float),
-                           numpy.array([-BALL_SPEED, BALL_SPEED], dtype=float),
-                           numpy.array([BALL_SPEED, -BALL_SPEED], dtype=float),
-                           numpy.array([-BALL_SPEED, -BALL_SPEED], dtype=float)]
+    desired_angles = [numpy.pi * i / 4 for i in [1, 3, 7, 5][:player_num]]
+    angle_variation = numpy.pi / 16  # +/- 11.25 degrees variation
+    start_angles = desired_angles + numpy.random.uniform(-angle_variation, angle_variation, player_num)
+    ball_directions = numpy.vstack((numpy.cos(start_angles), numpy.sin(start_angles))).T
+    ball_directions /= numpy.linalg.norm(ball_directions, axis=1)[:, numpy.newaxis]
 
     running = True
     paused = False
@@ -106,8 +105,8 @@ def main(args):
         if not paused and not gameover:
             for i in range(player_num):
                 ball_directions[i] = pong_wars_model.update_square_and_bounce(ball_positions[i], ball_directions[i], i+1, squares, SQUARE_SIZE, BALL_RADIUS)    # Player index in "squares" starts from "1" rather than "0"
-                ball_directions[i] = pong_wars_model.check_boundary_collision(ball_positions[i], ball_directions[i], width_pixel, height_pixel, BALL_RADIUS)
-                ball_positions[i] += ball_directions[i]
+                ball_directions[i] = pong_wars_model.check_boundary_collision(ball_positions[i], ball_directions[i], width_pixel, height_pixel, BALL_RADIUS, BALL_SPEED)
+                ball_positions[i] += ball_directions[i] * BALL_SPEED
 
         pong_wars_view.draw_squares(squares, screen, SQUARE_SIZE, PLAYER_COLORS)
 
