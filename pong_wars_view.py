@@ -32,12 +32,12 @@ def draw_centered_text_panel(screen, texts, font, width, height, panel_height, p
 
 def draw_tutorial_panel(isPaused, screen, font, width, height, panel_height, panel_color, text_color, player_num):
     tutorial_texts = [
-        "Paused",
+        "P: Continue",
         ("1,2,3,4" if player_num == 4 else "1,2") + ": Change player", 
         "Arrow Keys: Move overwrite area", 
         "Enter: Overwrite"
     ] if isPaused else [
-        "P: Pause / Restart"
+        "P: Pause"
     ]
 
     # Draw the background panel at the bottom
