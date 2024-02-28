@@ -6,7 +6,18 @@ import pygame
 import os
 
 
-def draw_centered_text_panel(screen, texts, font, width, height, panel_height, panel_color, player_num, player_colors):
+def draw_centered_text_panel(screen, text, font, width, height, panel_height, panel_color, text_color):
+    # Draw the background panel at the bottom
+    pygame.draw.rect(screen, panel_color, (0, height, width, panel_height))
+
+    surface = font.render(text, True, text_color)
+    text_x = (width - surface.get_width()) // 2
+    text_y = height + (panel_height - font.get_height()) // 2
+    screen.blit(surface, (text_x, text_y))
+    text_x += surface.get_width()
+
+
+def draw_centered_text_each_player_panel(screen, texts, font, width, height, panel_height, panel_color, player_num, player_colors):
     # Draw the background panel at the bottom
     pygame.draw.rect(screen, panel_color, (0, height, width, panel_height))
 
@@ -19,7 +30,7 @@ def draw_centered_text_panel(screen, texts, font, width, height, panel_height, p
         surfaces.append(surface)
         total_width += surface.get_width() + 30  # Include spacing
     total_width -= 30
-    
+
     # Start position for the first score text to center the block
     text_x = (width - total_width) // 2
     text_y = height + (panel_height - font.get_height()) // 2
