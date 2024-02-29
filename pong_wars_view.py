@@ -84,7 +84,7 @@ def draw_ball(position, color, screen, square_size):
     pygame.draw.circle(screen, color, (int(position[0]), int(position[1])), square_size // 2)
 
 
-def make_gif(frames_dir, delete_frames=True):
+def make_gif(player_num, frames_dir, delete_frames=True):
     from moviepy.editor import ImageSequenceClip
     from natsort import natsorted
     import glob
@@ -92,7 +92,7 @@ def make_gif(frames_dir, delete_frames=True):
     
     clip = ImageSequenceClip(frame_files, fps=60)
     pics_dir = "./pics"
-    clip.write_gif(os.path.join(pics_dir, "4_players.gif"))
+    clip.write_gif(os.path.join(pics_dir, str(player_num) + "_players.gif"))
     # delete frames
     if delete_frames:
         # remove frames folder

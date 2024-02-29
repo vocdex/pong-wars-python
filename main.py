@@ -169,8 +169,7 @@ def main(args):
     
     pygame.quit()
     if args.record_frames:
-        pong_wars_view.make_gif(frame_dir)
-
+        pong_wars_view.make_gif(player_num, frame_dir)
 
 
 if __name__ == "__main__":
