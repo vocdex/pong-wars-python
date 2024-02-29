@@ -1,25 +1,20 @@
-# WIP 
-
-<!---
-# Pong Wars
-<div align="center">
-    <img src="./pics/4_players.gif" width="400" alt="Pong Wars" />
-    <img src="./pics/2_players.gif" width="400" alt="Pong Wars" /> 
-</div>
-
-## Description
-Pong Wars is a colorful and dynamic variation of the classic Pong game implemented in Python using Pygame. In this game, two balls compete to fill the game area with their respective colors.
+# Pong Wars Strategy
+A variation of [Pong Wars](https://github.com/vnglst/pong-wars). In this variation, players can affect the war actively by overwriting others' areas rather than just watch whatever happens. And the game has a time limit now, so there will be an end and a winner.
 
 The current version of the game supports two modes: 2 players and 4 players.
+
+## Description
+After the war starts, players can PAUSE the game at any time and OVERWRITE an area with their own color if not in cooldown. The war is time limited, so when it ends the one holding the largest area will be the winner.
+
 ## Dependencies
-The project requires Python along with the following libraries:
+The project requires Python (3.6 or later) along with the following libraries:
 ```bash
-pip install pygame moviepy natsort
+pip install numpy pygame moviepy natsort
 ```
 ## Usage
 ```bash
-python 2_players.py
-python 4_players.py
+python --player_num 2
+python --player_num 4
 ```
 #### Options
 ```bash
@@ -29,10 +24,11 @@ args:
 ```
 
 ## Credits
-1. This code is inspired by Koen van Gilst's JavaScript implementation of [Pong Wars](https://github.com/vnglst/pong-wars)
-2. Relevant Hacker News discussion: [Show HN: Pong Wars – A colorful and dynamic variation of the classic Pong game](https://news.ycombinator.com/item?id=39159418)
+This code is inspired by vocdex's Pygame implementation of [pong-wars-python](https://github.com/vocdex/pong-wars-python)
 
 ## What's next?
-1. Build Gymnasium environment for Pong Wars to train RL agents
-
--->
+1. The game balance is under adjustment, more tests needed.
+2. Maybe no overwrite during the last part of the game would be better.
+3. Code Refactoring.
+4. Complete game flow including choosing player num at the start and being able to restart without closing the game.
+5. Better UI.
