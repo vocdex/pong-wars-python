@@ -18,6 +18,9 @@ SQUARE_SIZE = 16                                # Size of a square in pixel
 BALL_RADIUS = 12                                # Radius of the ball
 BALL_SPEED = 15                                 # Speed of the ball in pixel, better not bigger than SQUARE_SIZE
 
+OVERWRITE_AREA_MOVE_SPEED = SQUARE_SIZE / 4.0
+OVERWRITE_SIZE = 8 * SQUARE_SIZE
+
 TEXT_PANEL_HEIGHT = 20
 TUTORIAL_PANEL_HEIGHT = 100
 
@@ -82,8 +85,7 @@ def main(args):
 
     overwrite_player_index = 1
     overwrite_position = numpy.array([width_pixel // 2, height_pixel // 2], dtype=float)
-    overwrite_size = numpy.array([8 * SQUARE_SIZE, 8 * SQUARE_SIZE], dtype=float)
-    overwrite_area_move_speed = SQUARE_SIZE / 12.0
+    overwrite_size = numpy.array([OVERWRITE_SIZE, OVERWRITE_SIZE], dtype=float)
     overwrite_cooldown_timers = numpy.zeros(player_num, dtype=float)
     
     while running:
