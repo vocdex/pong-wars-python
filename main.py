@@ -116,13 +116,13 @@ def main(args):
         if paused:
             keys = pygame.key.get_pressed()
             if keys[pygame.K_LEFT]:
-                overwrite_position[0] -= overwrite_area_move_speed
+                overwrite_position[0] -= OVERWRITE_AREA_MOVE_SPEED
             if keys[pygame.K_RIGHT]:
-                overwrite_position[0] += overwrite_area_move_speed
+                overwrite_position[0] += OVERWRITE_AREA_MOVE_SPEED
             if keys[pygame.K_UP]:
-                overwrite_position[1] -= overwrite_area_move_speed
+                overwrite_position[1] -= OVERWRITE_AREA_MOVE_SPEED
             if keys[pygame.K_DOWN]:
-                overwrite_position[1] += overwrite_area_move_speed
+                overwrite_position[1] += OVERWRITE_AREA_MOVE_SPEED
 
             real_overwrite_position, real_overwrite_size = pong_wars_model.calculate_overwrite_area(overwrite_position, overwrite_size, width_pixel, height_pixel)
             pong_wars_view.draw_overwrite_area_cover(screen, real_overwrite_position, real_overwrite_size, PLAYER_COLORS[overwrite_player_index-1], 0.5)
