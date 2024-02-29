@@ -35,8 +35,9 @@ TEXT_COLOR = (255, 255, 255)
 GAME_TIME = 2 * 60              # In seconds
 OVERWRITE_COOLDOWN_TIME = 20    # In seconds
 
+
 def main(args):
-    player_num = 2
+    player_num = 4
 
     if args.seed:
         random.seed(args.seed)
@@ -178,6 +179,6 @@ if __name__ == "__main__":
     args = argparse.ArgumentParser()
     args.add_argument("--record_frames", action="store_true", help="Record frames for making a movie", default=False)
     args.add_argument("--seed", type=int, help="Seed for random number generator", default=0)
-    args.add_argument("--player_num", type=int, help="Number of Players. Currently only '2' and '4' are supported", default=2)
+    args.add_argument("--player_num", type=int, help="Number of Players. Currently only '2' and '4' are supported", default=4)
     args = args.parse_args()
     main(args)
